@@ -1,59 +1,38 @@
 import pandas as pd
+from sklearn.utils import shuffle
 
-'''file = 'datasets/NLP聊天内容梳理2022.9.19中性无重复.xlsx'
-data1 = pd.read_excel(file, header=None, sheet_name=0, skiprows=[0])
-data2 = pd.read_excel(file, header=None, sheet_name=1, skiprows=[0])
-content1=[]
-content2=[]
-content3=[]
+'''print(s)
+    start=time.time()
+    pattern=re.compile(r'\s+')
+    s1=re.sub(pattern, "", s)
+    print(time.time()-start)
+    print(s1)
 
-for i in range((len(data1[0]))):
-    id=str(data1[0].iloc[i]).strip()
-    line = str(data1[1].iloc[i]).replace("\t", "").replace("\n", "").replace("\r", "").replace(" ","").strip()
-    content1.append((id,line))
-
-
-
-for i in range((len(data2[0]))):
-    id=str(data2[0].iloc[i]).strip()
-    line = str(data2[1].iloc[i]).replace("\t", "").replace("\n", "").replace("\r", "").replace(" ","").strip()
-    content2.append((id,line))
-
-
-for i in content1:
-    for j in content2:
-        if str(i[1])==str(j[1]):
-            content3.append((str(i[1]),str(i[0]),str(j[0])))
-            break
-
-
-dataframe = pd.DataFrame(content3)
-
-
-dataframe.to_excel('C:/Users/sunyongfa/Desktop/result.xls')'''
+    start = time.time()
+    s2=s.replace("\t","").replace("\n", "").replace(" ", "")
+    print(time.time() - start)
+    print(s2)'''
 
 
 if __name__=="__main__":
-    poscount = 0
-    negcount = 0
-    chatcount = 0
-    neuralcount = 0
-    with open("datasets/dev.tsv", 'r', encoding="utf-8") as f:
-        for line in f:
-            label=line.split("\t")[0]
-            if label.strip() == "1":
-                negcount += 1
-            if label.strip() == "0":
-                poscount += 1
-            if label.strip() == "2":
-                chatcount += 1
-            if label.strip() == "3":
-                neuralcount += 1
+    file = 'NLP聊天内容梳理2022.10.08.xlsx'
+    data1 = pd.read_excel(file, header=None, sheet_name=0, skiprows=[0])
+    data2 = pd.read_excel(file, header=None, sheet_name=1, skiprows=[0])
 
-    print(poscount, negcount, chatcount, neuralcount)
+    data1.drop_duplicates(subset=1, keep='first', inplace=True)
+    data2.drop_duplicates(subset=1, keep='first', inplace=True)
+    set1 = set(data1[1])
+    set2 = set(data2[1])
+    set3 = set1 & set2
+    set4 = set1 | set2
+    print(len(set3))
+    print(len(set4))
 
-
-
-
-
-
+    rename = ['textid', 'content']
+    data1.columns = rename
+    rename = ['sentiid', 'content']
+    data2.columns = rename
+    df_pri = pd.merge(data1, data2, on='content', how='outer')
+    order_columns = ['content', 'sentiid', 'textid']
+    df_pri = df_pri[order_columns]
+    df_pri.to_excel('C:/Users/sunyongfa/Desktop/result.xlsx')
